@@ -18,6 +18,8 @@ import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -74,20 +76,25 @@ class MainActivity : ComponentActivity() {
         log("onRun, start")
         scope.launch {
             log("coroutine start")
-            TimeUnit.MILLISECONDS.sleep(3000L)
+            var x = 0
+            while (x < 5 && isActive) {
+                delay(1000L)
+                log("coroutine, ${x++}")
+            }
             log("coroutine end")
         }
-        log("middle")
+       /* log("middle")
         scope.launch {
             log("coroutine1 start")
             TimeUnit.MILLISECONDS.sleep(1500L)
             log("coroutine1 end")
-        }
+        }*/
         log("onRun, end")
     }
 
     private fun onCancel() {
-
+        log("onCancel")
+        scope.cancel()
     }
 
     private fun log(text: String) {
