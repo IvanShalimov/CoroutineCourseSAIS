@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -92,6 +93,24 @@ class MainActivity : ComponentActivity() {
         log("onRun, end")
     }
 
+    private fun onRun1() {
+        scope.launch {
+            log("parent coroutine start")
+            val job = launch {
+                log("child coroutine start")
+                delay(1000L)
+                log("child coroutine end")
+            }
+            log("parent coroutine waits to child completes")
+            job.join()
+            log("parent coroutine end")
+        }
+    }
+
+    private fun onRun2() {
+
+    }
+
     private fun onCancel() {
         log("onCancel")
         scope.cancel()
@@ -107,12 +126,23 @@ class MainActivity : ComponentActivity() {
             text = "Hello $name!",
             modifier = modifier
         )*/
-        Row {
-            Button(onClick = { onRun() }) {
-                Text("Run")
+        Column {
+            Row {
+                Button(onClick = { onRun() }) {
+                    Text("Run")
+                }
+                Button(onClick = { onCancel() }) {
+                    Text("Cancel")
+                }
             }
-            Button(onClick = { onCancel() }) {
-                Text("Cancel")
+            Text(text = "Lesson 9")
+            Row {
+                Button(onClick = { onRun1() }) {
+                    Text("Run1")
+                }
+                Button(onClick = { onRun2() }) {
+                    Text("Run2")
+                }
             }
         }
     }
