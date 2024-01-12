@@ -46,9 +46,15 @@ class MainActivity : ComponentActivity() {
         scope.launch {
             Log.d("Ivan","second coroutine")
         }
-        scope.launch {
-            Log.d("Ivan","third coroutine")
+
+        Log.d("Ivan","top scope $scope")
+        val job = scope.launch {
+            Log.d("Ivan","first this: $this")
+            this.launch {
+                Log.d("Ivan","second this: $this")
+            }
         }
+        Log.d("Ivan","top job: $job")
 
     }
 
