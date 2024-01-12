@@ -17,7 +17,9 @@ import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.tooling.preview.Preview
 import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -30,6 +32,7 @@ import java.util.concurrent.TimeUnit
 class MainActivity : ComponentActivity() {
     val scope = CoroutineScope(Job()) // the simplest creation of coroutine
     private var formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
+    lateinit var lazyJob: Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,14 +104,45 @@ class MainActivity : ComponentActivity() {
                 delay(1000L)
                 log("child coroutine end")
             }
-            log("parent coroutine waits to child completes")
+            val job1 = launch {
+                log("child coroutine1 start")
+                delay(1000L)
+                log("child coroutine1 end")
+            }
+
+            log("parent coroutine waits to children completes")
             job.join()
+            job1.join()
             log("parent coroutine end")
+        }
+
+        lazyJob = scope.launch(start = CoroutineStart.LAZY) {
+            log("lazy coroutine start")
+            delay(1000L)
+            log("lazy coroutine end")
         }
     }
 
     private fun onRun2() {
+        log("onRun2 start")
+        lazyJob.start()
+        log("onRun2 end")
+    }
 
+    private fun onRun3() {
+        scope.launch {
+            log("parent coroutine start")
+            val deferred = async {
+                log("child coroutine start")
+                delay(1000L)
+                log("child coroutine end")
+                "async result"
+            }
+            log("parent coroutine waits until child returns result")
+            val result = deferred.await()
+            log("parent coroutine, child result = $result")
+            log("parent coroutine end")
+        }
     }
 
     private fun onCancel() {
@@ -142,6 +176,9 @@ class MainActivity : ComponentActivity() {
                 }
                 Button(onClick = { onRun2() }) {
                     Text("Run2")
+                }
+                Button(onClick = { onRun3() }) {
+                    Text("Run3")
                 }
             }
         }
