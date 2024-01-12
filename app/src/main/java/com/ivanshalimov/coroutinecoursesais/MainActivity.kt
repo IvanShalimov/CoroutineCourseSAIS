@@ -1,6 +1,7 @@
 package com.ivanshalimov.coroutinecoursesais
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    val scope = CoroutineScope(Job()) // the simplest creation of coroutine
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -26,6 +33,28 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        scope.launch {
+            Log.d("Ivan","My first coroutine")
+        }
+        scope.launch {
+            Log.d("Ivan","first coroutine")
+        }
+        scope.launch {
+            Log.d("Ivan","second coroutine")
+        }
+        scope.launch {
+            Log.d("Ivan","third coroutine")
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
     }
 }
 
