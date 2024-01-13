@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
@@ -30,7 +31,8 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
-    val scope = CoroutineScope(Job()) // the simplest creation of coroutine
+    val context = Job() + Dispatchers.Default
+    val scope = CoroutineScope(context) // the simplest creation of coroutine
     private var formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
     lateinit var lazyJob: Job
 
@@ -150,6 +152,17 @@ class MainActivity : ComponentActivity() {
         scope.cancel()
     }
 
+    private fun onLogContext() {
+        val context = Job() + Dispatchers.Default
+        log("context: $context")
+    }
+
+    private fun onLogContextWithoutJob() {
+        val scope = CoroutineScope(Dispatchers.Default + UserData(0L, "Ivan", 17))
+        log("context = ${scope.coroutineContext}")
+        log("user data: ${scope.coroutineContext[UserData]}")
+    }
+
     private fun log(text: String) {
         Log.d("TAG", "${formatter.format(Date())} $text [${Thread.currentThread().name}]")
     }
@@ -179,6 +192,15 @@ class MainActivity : ComponentActivity() {
                 }
                 Button(onClick = { onRun3() }) {
                     Text("Run3")
+                }
+            }
+            Text(text = "Lesson 10")
+            Row {
+                Button(onClick = { onLogContext() }) {
+                    Text("LogContext")
+                }
+                Button(onClick = { onLogContextWithoutJob() }) {
+                    Text("ContextWithoutJob")
                 }
             }
         }
