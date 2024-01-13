@@ -165,6 +165,25 @@ class SecondActivity : ComponentActivity() {
         }
     }
 
+    private fun onC1() {
+        val scope = CoroutineScope(Job() + Dispatchers.IO)
+        val job = scope.launch {
+            log("parent start")
+            launch {
+                log("child start")
+                delay(1000)
+                log("child end")
+            }
+            log("parent end")
+        }
+
+        scope.launch {
+            delay(500)
+            log("parent job is active: ${job.isActive}")
+            delay(1000)
+            log("parent job is active: ${job.isActive}")
+        }
+    }
 
     private suspend fun getData(): String =
         suspendCancellableCoroutine {
@@ -220,6 +239,12 @@ class SecondActivity : ComponentActivity() {
                 }
                 Button(onClick = { onDR6() }) {
                     Text(text = "onRun6")
+                }
+            }
+            Text(text = "Lesson 12")
+            Row {
+                Button(onClick = { onC1() }) {
+                    Text("onRun")
                 }
             }
         }
