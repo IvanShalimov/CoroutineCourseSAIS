@@ -17,13 +17,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -185,6 +189,74 @@ class SecondActivity : ComponentActivity() {
         }
     }
 
+    private fun onEC() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        log("onRun start")
+
+        scope.launch {
+            try {
+                Integer.parseInt("a")
+            } catch (e: Exception) {
+                log("exception: $e")
+            }
+        }
+        log("onRun end")
+    }
+
+    private fun onEC1() {
+        val handler = CoroutineExceptionHandler {context, exception ->
+            log("exception: $exception")
+        }
+        val scope = CoroutineScope(Job() + Dispatchers.Default + handler)
+        log("onRun start")
+        scope.launch {
+            Integer.parseInt("a")
+        }
+        log("onRun end")
+    }
+
+    private fun onEC2() {
+        val handler = CoroutineExceptionHandler {context, exception ->
+            log("first coroutine exception: $exception")
+        }
+        val scope = CoroutineScope(Job() + Dispatchers.Default + handler)
+        scope.launch {
+            TimeUnit.MILLISECONDS.sleep(1000L)
+//            try {
+                Integer.parseInt("a")
+/*            } catch (e: Exception) {
+                log("first coroutine exception: $e")
+            }*/
+
+        }
+        scope.launch {
+            repeat(6) {
+                TimeUnit.MILLISECONDS.sleep(300L)
+                log("second coroutine isActive: $isActive")
+            }
+        }
+
+    }
+
+    private fun onEC3() {
+        val handler = CoroutineExceptionHandler {context, exception ->
+            log("first coroutine exception: $exception")
+        }
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default + handler)
+        scope.launch {
+            TimeUnit.MILLISECONDS.sleep(1000L)
+            Integer.parseInt("a")
+
+        }
+        scope.launch {
+            repeat(6) {
+                TimeUnit.MILLISECONDS.sleep(300L)
+                log("second coroutine isActive: $isActive")
+            }
+        }
+
+    }
+
     private suspend fun getData(): String =
         suspendCancellableCoroutine {
             log("suspend function start")
@@ -245,6 +317,21 @@ class SecondActivity : ComponentActivity() {
             Row {
                 Button(onClick = { onC1() }) {
                     Text("onRun")
+                }
+            }
+            Text("Lesson 13")
+            Row {
+                Button(onClick = { onEC() }) {
+                    Text(text = "onRun")
+                }
+                Button(onClick = { onEC1() }) {
+                    Text(text = "onRun1")
+                }
+                Button(onClick = { onEC2() }) {
+                    Text(text = "onRun2")
+                }
+                Button(onClick = { onEC3() }) {
+                    Text(text = "onRun3")
                 }
             }
         }
