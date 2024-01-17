@@ -20,6 +20,8 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -125,6 +127,118 @@ class ThirdActivity : ComponentActivity() {
         }
     }
 
+    private fun onRunC() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        val channel = Channel<Int>()
+
+        scope.launch {
+            launch {
+                delay(300L)
+                log("send 5")
+                channel.send(5)
+                log("send, done")
+            }
+
+            launch {
+                delay(1000L)
+                log("receive")
+                val i = channel.receive()
+                log("receive $i, done")
+            }
+        }
+    }
+
+    private fun onRunC1() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        val channel = Channel<Int>()
+
+        scope.launch {
+            launch {
+                delay(1000L)
+                log("send 5")
+                channel.send(5)
+                log("send, done")
+            }
+
+            launch {
+                delay(300L)
+                log("receive")
+                val i = channel.receive()
+                log("receive $i, done")
+            }
+        }
+    }
+
+    private fun onRunC2() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        val channel = Channel<Int>(2) // size of capacity - 2
+
+        scope.launch {
+            launch {
+                repeat(7) {
+                    delay(300L)
+                    log("send $it")
+                    channel.send(it)
+                }
+                log("close")
+                channel.close()// close the chanel - ClosedReceiveChannelException
+            }
+            launch {
+                for (element in channel) {
+                    log("received $element")
+                    delay(1000L)
+                }
+            }
+        }
+    }
+
+    private fun onRunC3() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        //Channel.Factory.UNLIMITED, Channel.Factory.BUFFERED(size = 64)
+        val channel = Channel<Int>(Channel.Factory.CONFLATED) //No buffer, replace value
+
+        scope.launch {
+            launch {
+                repeat(7) {
+                    delay(300L)
+                    log("send $it")
+                    channel.send(it)
+                }
+                log("close")
+                channel.close()// close the chanel - ClosedReceiveChannelException/ ClosedSendChannelException
+            }
+            launch {
+                for (element in channel) {
+                    log("received $element")
+                    delay(1000L)
+                }
+            }
+        }
+    }
+
+    private fun onRunC4() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        val channel = Channel<Int>(2) // CancellationException
+
+        scope.launch {
+            launch {
+                repeat(7) {
+                    delay(300L)
+                    log("send $it")
+                    channel.send(it)
+                }
+                log("close")
+                channel.cancel()// cancel the chanel, clean buffer
+            }
+            launch {
+                for (element in channel) {
+                    log("received $element")
+                    delay(1000L)
+                }
+            }
+        }
+    }
+
     @Composable
     fun Greeting(name: String, modifier: Modifier = Modifier) {
         Column {
@@ -138,6 +252,27 @@ class ThirdActivity : ComponentActivity() {
                 }
                 Button(onClick = { onRun2() }) {
                     Text("onRun2")
+                }
+            }
+            Text(text = "Lesson 18")
+            Row {
+                Button(onClick = { onRunC() }) {
+                    Text("onRun")
+                }
+                Button(onClick = { onRunC1() }) {
+                    Text("onRun1")
+                }
+                Button(onClick = { onRunC2() }) {
+                    Text("onRun2")
+                }
+                Button(onClick = { onRunC3() }) {
+                    Text("onRun3")
+                }
+            }
+            Text(text = "Lesson 18.1")
+            Row {
+                Button(onClick = { onRunC4() }) {
+                    Text(text = "onRun4")
                 }
             }
         }
