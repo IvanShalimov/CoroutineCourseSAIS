@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -107,6 +108,23 @@ class ThirdActivity : ComponentActivity() {
         }
     }
 
+    fun onRun2() {
+        val handler = CoroutineExceptionHandler { context, exception ->
+            log("$exception was handled in Coroutine_${context[CoroutineName]?.name}")
+        }
+
+        val scope = CoroutineScope(Job() + Dispatchers.Default + handler)
+
+        scope.launch {
+            log("parent context: $coroutineContext")
+            supervisorScope {
+                launch {
+                    log("context: $coroutineContext")
+                }
+            }
+        }
+    }
+
     @Composable
     fun Greeting(name: String, modifier: Modifier = Modifier) {
         Column {
@@ -117,6 +135,9 @@ class ThirdActivity : ComponentActivity() {
                 }
                 Button(onClick = { onRun1() }) {
                     Text("onRun1")
+                }
+                Button(onClick = { onRun2() }) {
+                    Text("onRun2")
                 }
             }
         }
