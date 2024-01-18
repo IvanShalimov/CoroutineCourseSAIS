@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -239,6 +240,27 @@ class ThirdActivity : ComponentActivity() {
         }
     }
 
+    private fun onRunFlow() {
+        val flow = flow {
+            // flow block
+            for (i in 1..10) {
+                delay(100L)
+                emit(i)
+            }
+        }
+
+        val scope = CoroutineScope(Job())
+
+        scope.launch {
+            flow.collect { i ->
+                //collect block
+                log("i: $i")
+            }
+        }
+    }
+
+
+
     @Composable
     fun Greeting(name: String, modifier: Modifier = Modifier) {
         Column {
@@ -273,6 +295,12 @@ class ThirdActivity : ComponentActivity() {
             Row {
                 Button(onClick = { onRunC4() }) {
                     Text(text = "onRun4")
+                }
+            }
+            Text(text = "Lesson 19")
+            Row {
+                Button(onClick = { onRunFlow() }) {
+                    Text(text = "onRun")
                 }
             }
         }
