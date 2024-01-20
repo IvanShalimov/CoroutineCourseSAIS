@@ -13,7 +13,7 @@
         android:theme="@style/Theme.CoroutineCourseSAIS"
         tools:targetApi="31">
         <activity
-            android:name=".FotrhActivity"
+            android:name=".ForthActivity"
             android:exported="true"
             android:label="@string/title_activity_fotrh"
             android:theme="@style/Theme.CoroutineCourseSAIS">

@@ -16,8 +16,11 @@ import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -26,9 +29,10 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class FotrhActivity : ComponentActivity() {
+class ForthActivity : ComponentActivity() {
 
     private var formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -44,7 +48,7 @@ class FotrhActivity : ComponentActivity() {
         }
     }
 
-    val scope = CoroutineScope(Job())
+    private val scope = CoroutineScope(Job())
 
     private fun onFlowRun() {
         val flowList = listOf(1,2,3).asFlow()
@@ -101,7 +105,33 @@ class FotrhActivity : ComponentActivity() {
         }
     }
 
-    private fun getUserData()=  UserData(1,"Alex", 17)
+    private fun onERun() {
+        val flow = flow {
+            delay(500)
+            emit("1")
+            delay(500)
+            emit("2")
+
+            val a = 1 / 0
+
+            delay(500)
+            emit("3")
+            delay(500)
+            emit("4")
+        }
+
+        scope.launch {
+            flow
+                .catch {
+                    log(formatter,"catch $it")
+                }
+                .collect {
+                    log(formatter,"collect $it")
+                }
+        }
+    }
+
+    private fun getUserData() = UserData(1,"Alex", 17)
 
     override fun onDestroy() {
         super.onDestroy()
@@ -111,6 +141,7 @@ class FotrhActivity : ComponentActivity() {
     @Composable
     fun Greeting(name: String, modifier: Modifier = Modifier) {
         Column {
+            Text(text = "Lesson ?")
             Row {
                 Button(onClick = { onFlowRun() }) {
                     Text("onR")
@@ -120,6 +151,12 @@ class FotrhActivity : ComponentActivity() {
                 }
                 Button(onClick = { onFlowRun2() }) {
                     Text("onR2")
+                }
+            }
+            Text(text = "Lesson 22")
+            Row {
+                Button(onClick = { onERun() }) {
+                    Text("onE")
                 }
             }
         }
