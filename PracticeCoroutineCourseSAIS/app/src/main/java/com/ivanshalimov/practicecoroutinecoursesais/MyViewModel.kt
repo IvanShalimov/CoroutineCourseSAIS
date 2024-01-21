@@ -2,14 +2,15 @@ package com.ivanshalimov.practicecoroutinecoursesais
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ivanshalimov.practicecoroutinecoursesais.database.AppDatabase
 import com.ivanshalimov.practicecoroutinecoursesais.network.FreeService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.jackson.JacksonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -24,6 +25,8 @@ class MyViewModel: ViewModel() {
         .build()
 
     var service: FreeService = retrofit.create(FreeService::class.java)
+
+
 
     fun test() {
         log(formatter, "before")
@@ -53,6 +56,13 @@ class MyViewModel: ViewModel() {
             }
 
         }
+    }
+
+    fun initDb(db: AppDatabase) {
+        viewModelScope.launch {
+            val commentsDao = db.comments().getAll()
+        }
+
     }
 
 }
