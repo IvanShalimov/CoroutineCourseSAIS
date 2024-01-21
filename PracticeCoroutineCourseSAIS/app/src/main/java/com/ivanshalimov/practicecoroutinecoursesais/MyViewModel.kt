@@ -2,27 +2,28 @@ package com.ivanshalimov.practicecoroutinecoursesais
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ivanshalimov.practicecoroutinecoursesais.network.FreeService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
+
 
 class MyViewModel: ViewModel() {
 
     private var formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
 
-   /* init {
-        log(formatter, "launch")
-        viewModelScope.launch {
-            while (true) {
-                delay(1000)
-                log(formatter, "work")
-            }
-        }
-    }*/
+    var retrofit = Retrofit.Builder()
+        .baseUrl("https://www.boredapi.com/api/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    var service: FreeService = retrofit.create(FreeService::class.java)
 
     fun test() {
         log(formatter, "before")
@@ -39,6 +40,19 @@ class MyViewModel: ViewModel() {
             log(formatter,"test1 launch")
         }
         log(formatter, "test1 after")
+    }
+
+    fun fetchData() {
+        // fetch data from retrofit
+        viewModelScope.launch {
+            try {
+                val response = service.getResponse()
+                log(formatter, "$response")
+            } catch (e: Exception) {
+                log(formatter, "exception: $e")
+            }
+
+        }
     }
 
 }

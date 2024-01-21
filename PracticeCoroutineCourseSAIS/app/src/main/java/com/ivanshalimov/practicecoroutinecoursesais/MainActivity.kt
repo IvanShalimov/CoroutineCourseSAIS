@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,27 +40,26 @@ class MainActivity : ComponentActivity() {
             }
         }
         myViewModel.test()
-        lifecycleScope.launch {
+        /*lifecycleScope.launch {
             while (true) {
                 delay(1000)
                 log(formatter, "work")
             }
-        }
+        }*/
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun onButtonClick() {
+        myViewModel.fetchData()
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PracticeCoroutineCourseSAISTheme {
-        Greeting("Android")
+    @Composable
+    fun Greeting(name: String, modifier: Modifier = Modifier) {
+        Column {
+            Row {
+                Button(onClick = { onButtonClick() }) {
+                    Text("Fetch data")
+                }
+            }
+        }
     }
 }
