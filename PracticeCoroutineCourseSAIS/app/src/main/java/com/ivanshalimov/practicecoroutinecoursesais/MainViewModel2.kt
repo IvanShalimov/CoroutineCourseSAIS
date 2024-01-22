@@ -29,7 +29,7 @@ class MainViewModel2: ViewModel() {
             deleteAll= DeleteAllUsersUseCase(it)
         }
 
-        val users = getUsers?.execute()?.asLiveData()
+        //val users = getUsers?.execute()?.asLiveData()
     }
 
     fun onAddClick() {
@@ -45,7 +45,7 @@ class MainViewModel2: ViewModel() {
 
     fun onClearClick() {
         viewModelScope.launch {
-            deleteAll.execute()
+            deleteAll?.execute()
         }
     }
 
