@@ -1,4 +1,4 @@
-package com.ivanshalimov.coroutinecoursesais
+package com.ivanshalimov.coroutinecoursesais.models
 
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext

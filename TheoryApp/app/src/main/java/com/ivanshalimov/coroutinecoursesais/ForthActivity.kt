@@ -12,19 +12,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.ivanshalimov.coroutinecoursesais.models.Event
+import com.ivanshalimov.coroutinecoursesais.models.UserData
 import com.ivanshalimov.coroutinecoursesais.ui.theme.CoroutineCourseSAISTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -131,6 +135,29 @@ class ForthActivity : ComponentActivity() {
         }
     }
 
+    private fun onSR() {
+        val _eventBus = MutableSharedFlow<Event>(replay = 3)
+        val eventbus = _eventBus.asSharedFlow()
+
+        scope.launch {
+            _eventBus.emit(Event("Init event")) // emit is suspend function
+            _eventBus.emit(Event("end event"))
+
+            eventbus.collect{
+                log(formatter, it.name)
+                if (it.name == "end event")
+                    cancel()
+                log(formatter, "cash = ${eventbus.replayCache}")
+            }
+
+            _eventBus.resetReplayCache()
+        }
+/*
+        scope.launch {
+
+        }*/
+    }
+
     private fun getUserData() = UserData(1,"Alex", 17)
 
     override fun onDestroy() {
@@ -157,6 +184,12 @@ class ForthActivity : ComponentActivity() {
             Row {
                 Button(onClick = { onERun() }) {
                     Text("onE")
+                }
+            }
+            Text(text = "Lesson 28")
+            Row {
+                Button(onClick = { onSR() }) {
+                    Text(text = "onSR")
                 }
             }
         }
