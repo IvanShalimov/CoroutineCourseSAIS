@@ -7,6 +7,8 @@ import com.ivanshalimov.practicecoroutinecoursesais.network.FreeService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -62,6 +64,31 @@ class MyViewModel: ViewModel() {
             val commentsDao = db.comments().getAll()
         }
 
+    }
+
+    val loading = MutableStateFlow(false)
+
+    val testService = TestService()
+    fun fetchDataForTest() {
+        loading.value = true
+
+        viewModelScope.launch() {
+            val data = testService.testRequest()
+            loading.value = false
+        }
+    }
+
+    val showDialog = MutableStateFlow(false)
+
+    fun showAndHideDialog() {
+        showDialog.value = false
+
+        viewModelScope.launch {
+            delay(1000)
+            showDialog.value = true
+            delay(3000)
+            showDialog.value = false
+        }
     }
 
 }
